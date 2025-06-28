@@ -5,10 +5,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env
-env_path = Path(__file__).resolve().parent / ".env"
+env_path = Path("/Users/beeexpressdesigns/FORECASTHER_MAIN.PY/forecasther/.env")
 load_dotenv(dotenv_path=env_path)
-API_KEY = os.getenv("WEATHERAPI_KEY")
+
+API_KEY = os.getenv("WEATHER_API_KEY")
+print(f"[DEBUG] Loaded WeatherAPI Key: {API_KEY}")
+# Load .env
+API_KEY = os.getenv("WEATHER_API_KEY")
 print(f"[DEBUG] Loaded WeatherAPI Key: {API_KEY}")
 
 BASE_URL = "https://api.weatherapi.com/v1/forecast.json"
