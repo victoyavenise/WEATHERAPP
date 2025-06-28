@@ -5,8 +5,14 @@ import os
 from datetime import datetime
 
 # Import your API and CSV handlers
-from weather_api_handler import fetch_weather_data, parse_daily_weather
+from weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
 from weather_csv_saver import save_to_csv
+
+
+# Debug print test
+lat, lon, city = get_user_location()
+print(f"Testing geolocation: {city} | Lat: {lat}, Lon: {lon}")
+
 
 CSV_FILE = "weather_data.csv"
 CSV_FIELDS = ["date", "temp", "humidity", "description", "hair_tip"]
@@ -30,7 +36,7 @@ def read_last_7_days():
 class WeatherAppGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("ForecastHer – Weekly Weather & Hair Tips")
+        self.root.title("ForecastHer – Weekly Weather")
         self.root.geometry("940x350")
         self.root.configure(bg=BG_COLOR)
         self.root.resizable(False, False)
