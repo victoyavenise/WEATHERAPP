@@ -5,47 +5,57 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
 
-env_path = Path("/Users/beeexpressdesigns/FORECASTHER_MAIN.PY/forecasther/.env")
+# Load the .env file from the main project directory
+env_path = Path(__file__).resolve().parent.parent / ".env"
+print(f"[DEBUG] Loading .env from: {env_path}")
 load_dotenv(dotenv_path=env_path)
 
 API_KEY = os.getenv("WEATHER_API_KEY")
-print(f"[DEBUG] Loaded WeatherAPI Key: {API_KEY}")
-# Load .env
-API_KEY = os.getenv("WEATHER_API_KEY")
-print(f"[DEBUG] Loaded WeatherAPI Key: {API_KEY}")
+print(f"[DEBUG] Loaded WEATHER_API_KEY: {API_KEY}")
 
 BASE_URL = "https://api.weatherapi.com/v1/forecast.json"
 
+# ------------------------------
+# Location Detection via IP
+# ------------------------------
 def get_user_location():
     try:
         response = requests.get("https://ipinfo.io/json")
         data = response.json()
-        loc = data['loc']
-        lat, lon = map(float, loc.split(','))
-        city = data['city']
-        region = data['region']
+        loc = data["loc"]
+        lat, lon = map(float, loc.split(","))
+        city = data["city"]
+        region = data["region"]
         print(f"[DEBUG] Location detected: {city}, {region} | Lat: {lat}, Lon: {lon}")
-        return city
+        return lat, lon, city
     except Exception as e:
         print(f"[ERROR] Failed to get location: {e}")
-        return "Atlanta"
+        return 33.749, -84.388, "Atlanta"  # Fallback to Atlanta
 
-def fetch_weather_data_by_location():
-    city = get_user_location()
-    url = f"{BASE_URL}?key={API_KEY}&q={city}&days=1&aqi=no&alerts=no"
+
+# ------------------------------
+# Fetch Weather from API
+# ------------------------------
+def fetch_weather_data():
+    _, _, city = get_user_location()
+    url = f"{BASE_URL}?key={API_KEY}&q={city}&days=5&aqi=no&alerts=no"
     print(f"[DEBUG] Requesting weather from: {url}")
     try:
         response = requests.get(url)
         data = response.json()
         if "current" in data:
-            return data, city
+            return data
         else:
-            print(f"❌ API response error: {data}")
-            return None, city
+            print(f"[ERROR] API response issue: {data}")
+            return None
     except Exception as e:
-        print(f"[ERROR] Failed to fetch weather: {e}")
-        return None, city
+        print(f"[ERROR] Failed to fetch weather data: {e}")
+        return None
 
+
+# ------------------------------
+# Parse & Format Daily Weather
+# ------------------------------
 def parse_daily_weather(data):
     current = data["current"]
     forecast = data["forecast"]["forecastday"][0]["day"]
@@ -72,14 +82,8 @@ def parse_daily_weather(data):
         "hair_tip": hair_tip
     }
 
-def print_current_conditions(data):
-    if not data:
-        print("No weather data to display.")
-        return
+# ------------------------------
+# Export functions for import
+# ------------------------------
+__all__ = ["fetch_weather_data", "get_user_location", "parse_daily_weather"]
 
-    humidity = data["current"]["humidity"]
-    condition = data["current"]["condition"]["text"]
-    temp = data["current"]["temp_f"]
-    print(f"🌡️ Current Temp: {temp}°F")
-    print(f"💧 Humidity: {humidity}%")
-    print(f"🌥️ Condition: {condition}")

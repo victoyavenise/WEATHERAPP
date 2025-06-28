@@ -13,9 +13,14 @@ def get_existing_dates():
         return set(row["date"] for row in reader)
 
 def save_to_csv(daily_data):
-    """Appends new daily weather data to CSV (avoids duplicates)."""
-    file_exists = os.path.isfile(CSV_FILE)
+    if isinstance(daily_data, dict):
+        daily_data = [daily_data]  # wrap dict into a list
+
+    print(f"[DEBUG] daily_data type: {type(daily_data)}")
+    print(f"[DEBUG] daily_data content: {daily_data}")
+
     existing_dates = get_existing_dates()
+    file_exists = os.path.isfile(CSV_FILE)
 
     with open(CSV_FILE, mode="a", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=CSV_FIELDS)
@@ -25,21 +30,20 @@ def save_to_csv(daily_data):
 
         new_rows = 0
         for day in daily_data:
+            print(f"[DEBUG] Current 'day' type: {type(day)} value: {day}")
             if day["date"] not in existing_dates:
-                writer.writerow(day)
+                writer.writerow(day)  # <-- this line was missing!
                 new_rows += 1
 
-    print(f"✅ {new_rows} new row(s) added to {CSV_FILE}." if new_rows else "ℹ️ No new data added.")
+    print(f"✅ {new_rows} new row(s) added.")
 
 # Optional: test the saver with dummy data
 if __name__ == "__main__":
-    dummy_data = [
-        {
-            "date": "2025-06-24",
-            "temp": 84.2,
-            "humidity": 68,
-            "description": "partly cloudy",
-            "hair_tip": "Uh oh. Hair’s starting to puff, wave up, or lose its press. That’s reversion knocking."
-        }
-    ]
+    dummy_data = {
+        "date": "2025-06-24",
+        "temp": 84.2,
+        "humidity": 68,
+        "description": "partly cloudy",
+        "hair_tip": "Uh oh. Hair’s starting to puff, wave up, or lose its press. That’s reversion knocking."
+    }
     save_to_csv(dummy_data)
