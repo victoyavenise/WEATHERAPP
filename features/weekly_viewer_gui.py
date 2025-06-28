@@ -9,11 +9,11 @@ import csv
 from datetime import datetime
 
 # Import API and CSV handlers
-from forecasther.config.weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
-from forecasther.data.weather_csv_saver import save_to_csv
+from config.weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
+from data.weather_csv_saver import save_to_csv
 
 # Import the function to display forecast cards
-from forecasther.features.five_day_forecast import create_forecast_card
+from features.five_day_forecast import create_forecast_card
 
 
 
