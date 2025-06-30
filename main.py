@@ -2,11 +2,15 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
 import os
+import sys
 from datetime import datetime
 from PIL import Image, ImageTk
 import requests
 from io import BytesIO
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from features.weekly_viewer_gui import create_weekly_viewer
 from config.weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
 from data.weather_csv_saver import save_to_csv
 
