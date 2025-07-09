@@ -36,21 +36,21 @@ def get_user_location():
 # ------------------------------
 # Fetch Weather from API
 # ------------------------------
-def fetch_weather_data():
-    _, _, city = get_user_location()
-    url = f"{BASE_URL}?key={API_KEY}&q={city}&days=5&aqi=no&alerts=no"
-    print(f"[DEBUG] Requesting weather from: {url}")
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if "current" in data:
-            return data
-        else:
-            print(f"[ERROR] API response issue: {data}")
-            return None
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch weather data: {e}")
+def fetch_weather_data(city_name):
+    import requests
+    import os
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    API_KEY = os.getenv("WEATHER_API_KEY")
+
+    url = f"https://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={city_name}&days=5&aqi=no&alerts=no"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
         return None
+
 
 
 # ------------------------------

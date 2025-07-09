@@ -1,171 +1,162 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import csv
-import os
-import sys
-from datetime import datetime
+from tkinter import simpledialog
 from PIL import Image, ImageTk
-import requests
-from io import BytesIO
+from datetime import datetime
+import os
+import csv
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from features.weekly_viewer_gui import create_weekly_viewer
 from config.weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
 from data.weather_csv_saver import save_to_csv
 
-CSV_FILE = os.path.join(os.path.dirname(__file__), "../data/weather_data.csv")
-CSV_FIELDS = ["date", "temp", "humidity", "description", "hair_tip"]
+# Paths
+CSV_FILE = os.path.join(os.path.dirname(__file__), "data/weather_data.csv")
+LOGO_PATH = "images/forecasther.png"
+BG_IMAGE_PATH = "images/Rectangle 4.png"
 
-# Brand colors
-BG_COLOR = "#ffe6f0"
-HEADER_COLOR = "#ff66b2"
-ROW_ALT_COLOR = "#fff5fb"
-FONT_COLOR = "#4b0082"
-ACCENT_BLUE = "#99ccff"
-CARD_COLOR = "#fff0f5"
+# Style
+APP_WIDTH = 320
+APP_HEIGHT = 600
+BG_COLOR = "#d9a5ff"
+BTN_COLOR = "#4b0082"
+FONT_COLOR = "white"
 
-
-def read_last_7_days():
-    if not os.path.isfile(CSV_FILE):
-        return []
-    with open(CSV_FILE, mode="r") as file:
-        reader = list(csv.DictReader(file))
-        return reader[-7:]
-
-
-def create_forecast_card(parent, day, temp, hi_lo, description, icon_url):
-    frame = tk.Frame(parent, bg=CARD_COLOR, bd=1, relief="solid")
-    frame.pack(side="left", padx=6, ipadx=10, ipady=10)
-
-    tk.Label(frame, text=day, font=("Helvetica", 10, "bold"), bg=CARD_COLOR, fg=FONT_COLOR).pack(pady=(5, 2))
-
-    try:
-        response = requests.get(f"https:{icon_url}", timeout=3)
-        img_data = Image.open(BytesIO(response.content)).resize((40, 40))
-        icon_img = ImageTk.PhotoImage(img_data)
-        icon_label = tk.Label(frame, image=icon_img, bg=CARD_COLOR)
-        icon_label.image = icon_img
-        icon_label.pack()
-    except:
-        tk.Label(frame, text="[No Img]", bg=CARD_COLOR).pack()
-
-    tk.Label(frame, text=f"{temp}°F", font=("Helvetica", 12, "bold"), bg=CARD_COLOR, fg=FONT_COLOR).pack()
-    tk.Label(frame, text=hi_lo, font=("Helvetica", 9), bg=CARD_COLOR).pack()
-    tk.Label(frame, text=description, wraplength=80, font=("Helvetica", 8), bg=CARD_COLOR).pack(pady=(0, 5))
-
-
-class WeatherAppGUI:
+class ForecastHerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ForecastHer – Weekly Weather")
-        self.root.geometry("980x600")
+        self.root.title("ForecastHer")
+        self.root.geometry(f"{APP_WIDTH}x{APP_HEIGHT}")
         self.root.configure(bg=BG_COLOR)
         self.root.resizable(False, False)
 
-        self.setup_style()
-        self.create_widgets()
-        self.load_data()
+        self.setup_styles()
+        self.create_hamburger_menu()
+        self.create_tabs()
 
-    def setup_style(self):
+    def setup_styles(self):
         style = ttk.Style()
         style.theme_use("default")
-        style.configure(
-            "Treeview",
-            background="white",
-            foreground=FONT_COLOR,
-            rowheight=32,
-            fieldbackground=BG_COLOR,
-            font=("Helvetica", 10),
+        style.configure("Custom.TFrame", background=BG_COLOR)
+        style.configure("TNotebook.Tab", font=("Helvetica", 10, "bold"))
+
+    def create_hamburger_menu(self):
+        self.menu_button = tk.Menubutton(
+            self.root, text="☰", relief=tk.FLAT,
+            bg=BG_COLOR, fg=FONT_COLOR, font=("Arial", 16)
         )
-        style.configure(
-            "Treeview.Heading",
-            font=("Helvetica", 11, "bold"),
-            background=HEADER_COLOR,
-            foreground="white",
-        )
-        style.map(
-            "Treeview",
-            background=[("selected", ACCENT_BLUE)],
-            foreground=[("selected", "black")],
-        )
+        self.menu = tk.Menu(self.menu_button, tearoff=0)
+        self.menu.add_command(label="Home", command=lambda: self.select_tab(0))
+        self.menu.add_command(label="Favorite Cities", command=lambda: self.select_tab(1))
+        self.menu.add_command(label="HairCast", command=lambda: self.select_tab(2))
+        self.menu_button["menu"] = self.menu
+        self.menu_button.place(x=APP_WIDTH - 40, y=10)
 
-    def create_widgets(self):
-        self.tree = ttk.Treeview(self.root, columns=CSV_FIELDS, show="headings", height=7)
-        self.tree.tag_configure("even", background=ROW_ALT_COLOR)
-        self.tree.tag_configure("odd", background="white")
+    def create_tabs(self):
+        self.tab_control = ttk.Notebook(self.root)
 
-        for col in CSV_FIELDS:
-            self.tree.heading(col, text=col.capitalize())
-            self.tree.column(col, width=160 if col == "hair_tip" else 100, anchor="center")
+        self.home_tab = ttk.Frame(self.tab_control, style="Custom.TFrame")
+        self.fav_tab = ttk.Frame(self.tab_control, style="Custom.TFrame")
+        self.hair_tab = ttk.Frame(self.tab_control, style="Custom.TFrame")
 
-        self.tree.pack(padx=12, pady=12, fill="x")
+        self.tab_control.add(self.home_tab, text="Home")
+        self.tab_control.add(self.fav_tab, text="Favorites")
+        self.tab_control.add(self.hair_tab, text="HairCast")
 
-        self.refresh_button = ttk.Button(self.root, text="Refresh Data", command=self.refresh_data)
-        self.refresh_button.pack(pady=(0, 10))
+        self.tab_control.pack(expand=1, fill="both", pady=(50, 0))
 
-        self.forecast_frame = tk.Frame(self.root, bg=BG_COLOR)
-        self.forecast_frame.pack(padx=12, pady=(10, 20), fill="x")
+        self.build_home_screen(self.home_tab)
+        self.build_fav_screen(self.fav_tab)
+        self.build_hair_screen(self.hair_tab)
 
-    def load_data(self):
-        for row in self.tree.get_children():
-            self.tree.delete(row)
+    def build_home_screen(self, parent):
+        self.bg_canvas = tk.Canvas(parent, width=APP_WIDTH, height=APP_HEIGHT, highlightthickness=0)
+        self.bg_canvas.pack(fill="both", expand=True)
 
-        data = read_last_7_days()
-        for i, row in enumerate(data):
-            tag = "even" if i % 2 == 0 else "odd"
-            self.tree.insert("", "end", values=[row.get(col, "") for col in CSV_FIELDS], tags=(tag,))
-
-        self.show_today_hair_tip(data)
-
-    def refresh_data(self):
-        self.refresh_button.config(state="disabled")
-        self.root.update_idletasks()
         try:
-            weather_data = fetch_weather_data()
-            forecast_days = weather_data["forecast"]["forecastday"][:5] if weather_data else []
-
-            if weather_data:
-                daily_data = parse_daily_weather(weather_data)
-                save_to_csv(daily_data)
-                self.load_forecast(forecast_days)
-                messagebox.showinfo("Success", "Weather data refreshed successfully!")
-            else:
-                messagebox.showwarning("Warning", "Failed to fetch weather data.")
+            bg_image = Image.open(BG_IMAGE_PATH).resize((APP_WIDTH, APP_HEIGHT))
+            self.bg_photo = ImageTk.PhotoImage(bg_image)
+            self.bg_canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred:\n{e}")
-        finally:
-            self.refresh_button.config(state="normal")
-            self.load_data()
+            print("Failed to load background:", e)
 
-    def load_forecast(self, forecast_days):
-        for widget in self.forecast_frame.winfo_children():
-            widget.destroy()
+        try:
+            logo = Image.open(LOGO_PATH).resize((300, 300))
+            self.logo_photo = ImageTk.PhotoImage(logo)
+            self.bg_canvas.create_image(APP_WIDTH // 2, 100, image=self.logo_photo)
+        except Exception as e:
+            print("Logo failed to load:", e)
 
-        for day_data in forecast_days:
-            day_name = datetime.strptime(day_data["date"], "%Y-%m-%d").strftime("%A").upper()
-            temp = round(day_data["day"]["avgtemp_f"])
-            hi_lo = f"{round(day_data['day']['maxtemp_f'])}° | {round(day_data['day']['mintemp_f'])}°"
-            condition = day_data["day"]["condition"]["text"]
-            icon_url = day_data["day"]["condition"]["icon"]
+        self.bg_canvas.create_text(APP_WIDTH // 2, 240, text="forecastHer", font=("Helvetica", 22, "bold"), fill="white")
+        self.bg_canvas.create_text(APP_WIDTH // 2, 270, text="Weather Forecast for Her", font=("Helvetica", 14, "italic"), fill="white")
 
-            create_forecast_card(self.forecast_frame, day_name, temp, hi_lo, condition, icon_url)
+        self.city_label = self.bg_canvas.create_text(APP_WIDTH // 2, 320, text="", font=("Helvetica", 12, "bold"), fill="white")
+        self.weather_label = self.bg_canvas.create_text(APP_WIDTH // 2, 350, text="", font=("Helvetica", 12), fill="white")
 
-    def show_today_hair_tip(self, data):
-        today = datetime.now().strftime("%Y-%m-%d")
-        today_data = next((row for row in data if row["date"] == today), None)
-        if today_data:
-            humidity = today_data.get("humidity", "?")
-            tip = today_data.get("hair_tip", "No tip available.")
-            messagebox.showinfo("Today's Hair Tip", f"Humidity: {humidity}%\n\n{tip}")
+        self.find_btn = tk.Button(
+            self.bg_canvas,
+            text="Find Your City",
+            font=("Helvetica", 12, "bold"),
+            bg=BTN_COLOR,
+            fg="white",
+            relief="raised",
+            padx=10,
+            pady=5,
+            command=self.open_city_search_page
+        )
+        self.bg_canvas.create_window(APP_WIDTH // 2, 400, window=self.find_btn)
 
+    def open_city_search_page(self):
+        search_window = tk.Toplevel(self.root)
+        search_window.title("Search City")
+        search_window.geometry("300x200")
+        search_window.configure(bg="white")
+        search_window.resizable(False, False)
 
-def create_weekly_viewer():
-    root = tk.Tk()
-    app = WeatherAppGUI(root)
-    root.mainloop()
+        tk.Label(search_window, text="Enter City Name:", font=("Helvetica", 12, "bold"), bg="white").pack(pady=(20, 5))
+        city_entry = tk.Entry(search_window, font=("Helvetica", 12), width=25)
+        city_entry.pack(pady=5)
 
+        def submit_city():
+            city = city_entry.get()
+            if not city:
+                messagebox.showwarning("Required", "Please enter a city name.")
+                return
+
+            try:
+                self.bg_canvas.itemconfig(self.city_label, text=city)
+
+                data = fetch_weather_data(city)
+                current = data["current"]
+                temp = round(current["temp_f"])
+                condition = current["condition"]["text"]
+                self.bg_canvas.itemconfig(self.weather_label, text=f"{temp}°F – {condition}")
+
+                parsed = parse_daily_weather(data)
+                save_to_csv(parsed)
+
+                search_window.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
+        tk.Button(
+            search_window,
+            text="Search",
+            font=("Helvetica", 12, "bold"),
+            bg=BTN_COLOR,
+            fg="white",
+            command=submit_city
+        ).pack(pady=20)
+
+    def build_fav_screen(self, parent):
+        tk.Label(parent, text="Your Top 5 Cities", font=("Helvetica", 14, "bold"), fg=FONT_COLOR, bg=BG_COLOR).pack(pady=20)
+
+    def build_hair_screen(self, parent):
+        tk.Label(parent, text="Today's HairCast", font=("Helvetica", 14, "bold"), fg=FONT_COLOR, bg=BG_COLOR).pack(pady=20)
+
+    def select_tab(self, index):
+        self.tab_control.select(index)
 
 if __name__ == "__main__":
-    create_weekly_viewer()
-
+    root = tk.Tk()
+    app = ForecastHerApp(root)
+    root.mainloop()
