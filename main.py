@@ -8,6 +8,8 @@ import csv
 
 from config.weather_api_handler import fetch_weather_data, get_user_location, parse_daily_weather
 from data.weather_csv_saver import save_to_csv
+from features.favorite_cities_tab import FavoriteCitiesTab
+
 
 # Paths
 CSV_FILE = os.path.join(os.path.dirname(__file__), "data/weather_data.csv")
@@ -155,6 +157,7 @@ class ForecastHerApp:
 
 #top 5 cities 
     def build_fav_screen(self, parent):
+        FavoriteCitiesTab(parent)
         tk.Label(parent, text="Your Top 5 Cities", font=("Helvetica", 14, "bold"), fg=FONT_COLOR, bg=BG_COLOR).pack(pady=20)
 
 
