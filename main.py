@@ -39,6 +39,7 @@ class ForecastHerApp:
         style.configure("Custom.TFrame", background=BG_COLOR)
         style.configure("TNotebook.Tab", font=("Helvetica", 10, "bold"))
 
+#menu
     def create_hamburger_menu(self):
         self.menu_button = tk.Menubutton(
             self.root, text="☰", relief=tk.FLAT,
@@ -50,7 +51,7 @@ class ForecastHerApp:
         self.menu.add_command(label="HairCast", command=lambda: self.select_tab(2))
         self.menu_button["menu"] = self.menu
         self.menu_button.place(x=APP_WIDTH - 40, y=10)
-
+#tabs
     def create_tabs(self):
         self.tab_control = ttk.Notebook(self.root)
 
@@ -68,6 +69,7 @@ class ForecastHerApp:
         self.build_fav_screen(self.fav_tab)
         self.build_hair_screen(self.hair_tab)
 
+#home screen
     def build_home_screen(self, parent):
         self.bg_canvas = tk.Canvas(parent, width=APP_WIDTH, height=APP_HEIGHT, highlightthickness=0)
         self.bg_canvas.pack(fill="both", expand=True)
@@ -92,12 +94,13 @@ class ForecastHerApp:
         self.city_label = self.bg_canvas.create_text(APP_WIDTH // 2, 320, text="", font=("Helvetica", 12, "bold"), fill="white")
         self.weather_label = self.bg_canvas.create_text(APP_WIDTH // 2, 350, text="", font=("Helvetica", 12), fill="white")
 
+#find your city button
         self.find_btn = tk.Button(
             self.bg_canvas,
             text="Find Your City",
             font=("Helvetica", 12, "bold"),
-            bg=BTN_COLOR,
-            fg="white",
+            bg="white",
+            fg="PURPLE",
             relief="raised",
             padx=10,
             pady=5,
@@ -105,6 +108,7 @@ class ForecastHerApp:
         )
         self.bg_canvas.create_window(APP_WIDTH // 2, 400, window=self.find_btn)
 
+#search yo city window
     def open_city_search_page(self):
         search_window = tk.Toplevel(self.root)
         search_window.title("Search City")
@@ -115,6 +119,7 @@ class ForecastHerApp:
         tk.Label(search_window, text="Enter City Name:", font=("Helvetica", 12, "bold"), bg="white").pack(pady=(20, 5))
         city_entry = tk.Entry(search_window, font=("Helvetica", 12), width=25)
         city_entry.pack(pady=5)
+
 
         def submit_city():
             city = city_entry.get()
@@ -138,18 +143,22 @@ class ForecastHerApp:
             except Exception as e:
                 messagebox.showerror("Error", str(e))
 
+#sumbit city button
         tk.Button(
             search_window,
             text="Search",
             font=("Helvetica", 12, "bold"),
-            bg=BTN_COLOR,
-            fg="white",
+            bg="pink",
+            fg="pink",
             command=submit_city
         ).pack(pady=20)
 
+#top 5 cities 
     def build_fav_screen(self, parent):
         tk.Label(parent, text="Your Top 5 Cities", font=("Helvetica", 14, "bold"), fg=FONT_COLOR, bg=BG_COLOR).pack(pady=20)
 
+
+#hair cast tab
     def build_hair_screen(self, parent):
         tk.Label(parent, text="Today's HairCast", font=("Helvetica", 14, "bold"), fg=FONT_COLOR, bg=BG_COLOR).pack(pady=20)
 
