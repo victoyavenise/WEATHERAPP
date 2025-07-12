@@ -63,24 +63,30 @@ def parse_daily_weather(data):
     temp = current["temp_f"]
     humidity = current["humidity"]
     description = current["condition"]["text"]
-
-    # Hair tip logic
-    if humidity <= 50:
-        hair_tip = "You're good. Hair stays laid and holds its style with no issues."
-    elif 50 < humidity <= 65:
-        hair_tip = "Might get a lil frizzy or swell — especially if your hair drinks up moisture."
-    elif 65 < humidity <= 75:
-        hair_tip = "Uh oh. Hair’s starting to puff, wave, or lose its press. That’s reversion knocking."
-    else:
-        hair_tip = "Yeah… it’s a wrap. Curls and coils are back, press is gone."
-
+    
+    hair_tip = get_hair_tip(humidity)
+ 
     return {
         "date": dt,
         "temp": round(temp),
         "humidity": humidity,
         "description": description,
-        "hair_tip": hair_tip
+        "hair_tip": get_hair_tip
     }
+
+# ------------------------------
+# Hair Tip Function
+# ------------------------------
+def get_hair_tip(humidity):
+    if humidity <= 50:
+        return "You're good. Hair stays laid and holds its style with no issues."
+    elif 51 <= humidity <= 65:
+        return "Might get a lil frizzy or swell — especially if your hair drinks up moisture."
+    elif 66 <= humidity <= 75:
+        return "Uh oh. Hair’s starting to puff, wave, or lose its press."
+    else:
+        return "Yeah… it’s a wrap. Curls and coils are back, press is gone."
+
 
 # ------------------------------
 # Export functions for import
