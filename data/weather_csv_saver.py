@@ -10,34 +10,44 @@ def get_existing_dates():
         return set()
     with open(CSV_FILE, mode="r") as file:
         reader = csv.DictReader(file)
-        return set(row["date"] for row in reader)
+        return set(row["date"] for row in reader if "date" in row and row["date"])
 
 def save_to_csv(daily_data):
+    """Appends valid weather data to CSV if date is new."""
     if isinstance(daily_data, dict):
-        daily_data = [daily_data]  # wrap dict into a list
+        daily_data = [daily_data]  # wrap single dict in a list
 
-    print(f"[DEBUG] daily_data type: {type(daily_data)}")
-    print(f"[DEBUG] daily_data content: {daily_data}")
+    print(f"[DEBUG] Received {len(daily_data)} forecast day(s)")
 
     existing_dates = get_existing_dates()
     file_exists = os.path.isfile(CSV_FILE)
 
     with open(CSV_FILE, mode="a", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=CSV_FIELDS)
-        
         if not file_exists:
             writer.writeheader()
 
         new_rows = 0
         for day in daily_data:
-            print(f"[DEBUG] Current 'day' type: {type(day)} value: {day}")
-            if day["date"] not in existing_dates:
-                writer.writerow(day)  # <-- this line was missing!
-                new_rows += 1
+            print(f"[DEBUG] Current day: {day}")
+            
+            # Validate each row
+            if not isinstance(day, dict):
+                print("❌ Skipping invalid row (not a dict):", day)
+                continue
+            if "date" not in day or not isinstance(day["date"], str):
+                print("❌ Skipping row with missing or invalid 'date':", day)
+                continue
+            if day["date"] in existing_dates:
+                print(f"⏩ Skipping duplicate date: {day['date']}")
+                continue
+
+            writer.writerow(day)
+            new_rows += 1
 
     print(f"✅ {new_rows} new row(s) added.")
 
-# Optional: test the saver with dummy data
+# Optional: Run test when this script is run directly
 if __name__ == "__main__":
     dummy_data = {
         "date": "2025-06-24",
