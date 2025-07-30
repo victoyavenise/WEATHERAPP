@@ -18,19 +18,32 @@ BASE_URL = "https://api.weatherapi.com/v1/forecast.json"
 # ------------------------------
 # Location Detection via IP
 # ------------------------------
+from geopy.geocoders import Nominatim
+
 def get_user_location():
     try:
+        # Step 1: Get IP-based lat/lon
         response = requests.get("https://ipinfo.io/json")
         data = response.json()
-        loc = data["loc"]
-        lat, lon = map(float, loc.split(","))
-        city = data["city"]
-        region = data["region"]
-        print(f"[DEBUG] Location detected: {city}, {region} | Lat: {lat}, Lon: {lon}")
-        return lat, lon, city
+        lat, lon = map(float, data["loc"].split(","))
+        
+        # Step 2: Use geopy to reverse-geocode into a city name
+        geolocator = Nominatim(user_agent="forecasther-app")
+        location = geolocator.reverse((lat, lon), language='en')
+
+        if location and "address" in location.raw:
+            city = location.raw["address"].get("city") or \
+                   location.raw["address"].get("town") or \
+                   location.raw["address"].get("state")
+        else:
+            city = data.get("city")  # fallback to IP city
+
+        print(f"[DEBUG] GeoPy City Detected: {city} | Lat: {lat}, Lon: {lon}")
+        return lat, lon, city or "Atlanta"
     except Exception as e:
-        print(f"[ERROR] Failed to get location: {e}")
-        return 33.749, -84.388, "Atlanta"  # Fallback to Atlanta
+        print(f"[ERROR] Failed to get location via geopy: {e}")
+        return 33.749, -84.388, "Atlanta"
+
 
 
 # ------------------------------
