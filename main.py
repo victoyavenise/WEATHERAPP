@@ -5,6 +5,7 @@ from tkinter import messagebox
 from config.weather_api_handler import fetch_weather_data, get_user_location, get_hair_tip
 from features.favorite_cities_tab import FavoriteCitiesTab
 from datetime import datetime
+from features.haircast_tab import HairCastTab
 
 # App Settings
 APP_WIDTH = 600
@@ -56,6 +57,9 @@ class ForecastHerApp:
         self.build_home_tab(self.home_tab)
         self.build_favorites_tab(self.favorites_tab)
 
+        self.build_haircast_tab(self.haircast_tab)
+
+
     
 
 
@@ -68,7 +72,7 @@ class ForecastHerApp:
                       fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
         ctk.CTkButton(navbar, text="Favorites", command=lambda: self.tabview.set("Favorites"),
                       fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
-        ctk.CTkButton(navbar, text="HairCast", command=lambda: print("HairCast"),
+        ctk.CTkButton(navbar, text="HairCast", command=lambda: self.tabview.set("HairCast"),
                       fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
 
         if os.path.exists(LOGO_PATH):
@@ -101,6 +105,9 @@ class ForecastHerApp:
 
     def build_favorites_tab(self, tab):
         FavoriteCitiesTab(tab)
+
+    def build_haircast_tab(self, tab):
+        HairCastTab(tab)
 
     def display_forecast_cards(self, forecast_days):
         for widget in self.forecast_scroll.winfo_children():

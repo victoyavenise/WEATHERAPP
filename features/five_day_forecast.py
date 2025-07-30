@@ -11,6 +11,7 @@ from config.weather_api_handler import fetch_weather_data
 
 FAV_CITIES_FILE = os.path.join(os.path.dirname(__file__), "../data/fav_cities.json")
 
+# Weather emoji icons
 WEATHER_EMOJIS = {
     "sunny": "images/sun.png",
     "clear": "images/sun_cloud.png",
@@ -38,7 +39,7 @@ def get_hair_tip(humidity):
     elif 65 < humidity <= 75:
         return "Hair’s starting to puff or wave."
     else:
-        return "Yeah… it’s a wrap. Press is gone."
+        return "Yeah… it’s a wrap. Ya baby hairs will curl up in a fist and swing on you."
 
 
 class FavoriteCitiesTab:
