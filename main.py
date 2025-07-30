@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import Image
 import os
 from tkinter import messagebox
 from config.weather_api_handler import fetch_weather_data, get_user_location, get_hair_tip
@@ -9,8 +9,9 @@ from datetime import datetime
 # App Settings
 APP_WIDTH = 600
 APP_HEIGHT = 550
-BG_IMAGE_PATH = "./images/gradient_purple_bg.png"  # Use relative path
+MAIN_BG_COLOR = "#D4A0FB"  # Use relative path
 LOGO_PATH = "./images/forecasther.png"  # Use relative path
+
 
 # Weather emoji image paths
 WEATHER_EMOJIS = {
@@ -39,43 +40,44 @@ class ForecastHerApp:
         self.root.geometry(f"{APP_WIDTH}x{APP_HEIGHT}")
         self.root.resizable(False, False)
 
-        self.build_background()
+        self.root.configure(fg_color=MAIN_BG_COLOR) # Use fg_color for CTk
         self.create_top_navbar()
 
         # Create Tab View
-        self.tabview = ctk.CTkTabview(self.root, width=APP_WIDTH - 20, height=APP_HEIGHT - 100)
+        self.tabview = ctk.CTkTabview(self.root, width=APP_WIDTH - 20, height=APP_HEIGHT - 100, fg_color="transparent")
         self.tabview.place(relx=0.5, rely=0.52, anchor="center")
 
         self.home_tab = self.tabview.add("Home")
         self.favorites_tab = self.tabview.add("Favorites")
 
+        self.home_tab.configure(fg_color="transparent")
+        self.favorites_tab.configure(fg_color="transparent")
+
         self.build_home_tab(self.home_tab)
         self.build_favorites_tab(self.favorites_tab)
 
-    def build_background(self):
-        if os.path.exists(BG_IMAGE_PATH):
-            bg_image = Image.open(BG_IMAGE_PATH).resize((APP_WIDTH, APP_HEIGHT))
-            self.bg_img = ctk.CTkImage(light_image=bg_image, size=(APP_WIDTH, APP_HEIGHT))
-            bg_label = ctk.CTkLabel(self.root, image=self.bg_img, text="", fg_color="transparent")
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    
+
 
     def create_top_navbar(self):
         navbar = ctk.CTkFrame(self.root, fg_color="transparent")
         navbar.place(x=10, y=10)
+        
 
         ctk.CTkButton(navbar, text="Home", command=lambda: self.tabview.set("Home"),
-                      fg_color="white", text_color="black").pack(side="left", padx=5)
+                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
         ctk.CTkButton(navbar, text="Favorites", command=lambda: self.tabview.set("Favorites"),
-                      fg_color="white", text_color="black").pack(side="left", padx=5)
+                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
         ctk.CTkButton(navbar, text="HairCast", command=lambda: print("HairCast"),
-                      fg_color="white", text_color="black").pack(side="left", padx=5)
+                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
 
         if os.path.exists(LOGO_PATH):
-            logo = Image.open(LOGO_PATH).resize((80, 80))
-            logo_img = ctk.CTkImage(light_image=logo, size=(80, 80))
-            logo_label = ctk.CTkLabel(self.root, image=logo_img, text="", fg_color="transparent")
+            logo = Image.open(LOGO_PATH).resize((120, 120))
+            logo_img = ctk.CTkImage(light_image=logo, size=(120, 120))
+            logo_label = ctk.CTkLabel(self.root, image=logo_img, text="", fg_color="#d4a0fb")
             logo_label.image = logo_img
-            logo_label.place(x=APP_WIDTH - 90, y=5)
+            logo_label.place(x=APP_WIDTH - 100, y=2)
+            
 
     def build_home_tab(self, tab):
         title = ctk.CTkLabel(tab, text="forecastHer", font=("Helvetica", 26, "bold"),
@@ -91,9 +93,9 @@ class ForecastHerApp:
         self.forecast_scroll.place(relx=0.5, y=100, anchor="n")
 
         btn = ctk.CTkButton(tab, text="Find Your City", font=("Helvetica", 14, "bold"),
-                            fg_color="#d94fe4", text_color="white", hover_color="#c94fd9",
+                            fg_color="#d94fe4", text_color="white", hover_color="#ff02c0",
                             command=self.find_city)
-        btn.place(relx=0.5, y=300, anchor="center")
+        btn.place(relx=0.5, y=350, anchor="center")
 
         self.load_forecast_by_location()
 
@@ -119,8 +121,8 @@ class ForecastHerApp:
 
             ctk.CTkLabel(card, text=weekday, font=("Helvetica", 12, "bold"), text_color="#4b0082").pack(pady=5)
             ctk.CTkLabel(card, text=month_day, font=("Helvetica", 10), text_color="#4b0082").pack(pady=5)
-            ctk.CTkLabel(card, text=f'{round(day["temp"])}°F', font=("Helvetica", 12)).pack()
-            ctk.CTkLabel(card, text=f'Hi: {round(day["hi"])}° | Lo: {round(day["lo"])}°', font=("Helvetica", 10)).pack()
+            ctk.CTkLabel(card, text=f'{round(day["temp"])}°F', font=("Helvetica", 12), text_color="#4b0082").pack()
+            ctk.CTkLabel(card, text=f'Hi: {round(day["hi"])}° | Lo: {round(day["lo"])}°', font=("Helvetica", 10),  text_color="#4b0082").pack()
 
             emoji_path = get_weather_emoji_icon(day["condition"])
             if emoji_path and os.path.exists(emoji_path):
@@ -189,7 +191,7 @@ class ForecastHerApp:
             print(f"[ERROR] Failed to auto-load forecast: {e}")
 
 if __name__ == "__main__":
-    ctk.set_appearance_mode("light")
+    ctk.set_appearance_mode("dark") 
     root = ctk.CTk()
     app = ForecastHerApp(root)
     root.mainloop()
