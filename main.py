@@ -84,21 +84,15 @@ class ForecastHerApp:
     def create_top_navbar(self):
         navbar = ctk.CTkFrame(self.root, fg_color="transparent")
         navbar.place(x=10, y=10)
-        
-
-        ctk.CTkButton(navbar, text="Home", command=lambda: self.tabview.set("Home"),
-                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
-        ctk.CTkButton(navbar, text="Favorites", command=lambda: self.tabview.set("Favorites"),
-                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
-        ctk.CTkButton(navbar, text="HairCast", command=lambda: self.tabview.set("HairCast"),
-                      fg_color="white", text_color="black", hover_color="#ff02c0").pack(side="left", padx=5)
 
         if os.path.exists(LOGO_PATH):
             logo = Image.open(LOGO_PATH).resize((120, 120))
             logo_img = ctk.CTkImage(light_image=logo, size=(120, 120))
             logo_label = ctk.CTkLabel(self.root, image=logo_img, text="", fg_color="#d4a0fb")
             logo_label.image = logo_img
-            logo_label.place(x=APP_WIDTH - 100, y=2)
+            # Center logo horizontally, anchor top center
+            logo_label.place(relx=0.5, y=2, anchor="n")
+
             
 
     def build_home_tab(self, tab):
