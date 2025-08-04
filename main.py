@@ -50,14 +50,16 @@ class ForecastHerApp:
 
         self.home_tab = self.tabview.add("Home")
         self.favorites_tab = self.tabview.add("Favorites")
+        self.haircast_tab = self.tabview.add("HairCast")
 
         self.home_tab.configure(fg_color="transparent")
         self.favorites_tab.configure(fg_color="transparent")
+        self.haircast_tab.configure(fg_color="transparent")
 
         self.build_home_tab(self.home_tab)
         self.build_favorites_tab(self.favorites_tab)
 
-        self.build_haircast_tab(self.haircast_tab)
+    
 
 
     
