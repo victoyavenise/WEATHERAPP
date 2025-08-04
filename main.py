@@ -7,6 +7,7 @@ from config.weather_api_handler import fetch_weather_data, get_user_location, ge
 from features.favorite_cities_tab import FavoriteCitiesTab
 from datetime import datetime
 from features.haircast_tab import HairCastTab
+from features.teamfeature.team_feature_tab import TeamFeatureTab
 
 # App Settings
 APP_WIDTH = 600
@@ -45,28 +46,41 @@ class ForecastHerApp:
         self.root.configure(fg_color=MAIN_BG_COLOR) # Use fg_color for CTk
         self.create_top_navbar()
 
-        # Create Tab View
-        self.tabview = ctk.CTkTabview(self.root, width=APP_WIDTH - 20, height=APP_HEIGHT - 100, fg_color="transparent")
+                # Create Tab View
+                # Create Tab View
+        self.tabview = ctk.CTkTabview(
+            self.root,
+            width=APP_WIDTH - 20,
+            height=APP_HEIGHT - 100,
+            fg_color="transparent"
+        )
         self.tabview.place(relx=0.5, rely=0.52, anchor="center")
 
+        # Add main tabs in order
         self.home_tab = self.tabview.add("Home")
         self.favorites_tab = self.tabview.add("Favorites")
         self.haircast_tab = self.tabview.add("HairCast")
+        self.team_feature_tab = self.tabview.add("Team Feature")  # ✅ Add the tab here
 
+        # Set background color for each
         self.home_tab.configure(fg_color="transparent")
         self.favorites_tab.configure(fg_color="transparent")
         self.haircast_tab.configure(fg_color="transparent")
+        self.team_feature_tab.configure(fg_color="transparent")
 
+        # Populate tabs
         self.build_home_tab(self.home_tab)
         self.build_favorites_tab(self.favorites_tab)
-        self.build_haircast_tab(self.haircast_tab)
 
-    
+        # HairCast content
+        haircast_frame = HairCastTab(self.haircast_tab)
+        haircast_frame.pack(fill="both", expand=True)
 
+        # Team Feature content
+        team_tab = TeamFeatureTab(master=self.team_feature_tab)  # ✅ Use stored frame
+        team_tab.pack(fill="both", expand=True)
 
-    
-
-
+        
     def create_top_navbar(self):
         navbar = ctk.CTkFrame(self.root, fg_color="transparent")
         navbar.place(x=10, y=10)
@@ -110,39 +124,6 @@ class ForecastHerApp:
     def build_favorites_tab(self, tab):
         FavoriteCitiesTab(tab)
 
-    def build_haircast_tab(self, tab):
-    # Pink background frame inside the tab
-        haircast_frame = ctk.CTkFrame(tab, fg_color="#fb03b5", corner_radius=0)  # Soft pink
-        haircast_frame.pack(fill="both", expand=True)
-    
-    # List of fun, sassy subtitles
-        haircast_subtitles = [
-            "See what today’s weather got planned for your hair, sis 💁🏽‍♀️",
-            "Find out if today’s forecast is hair goals… or hair drama 😅",
-            "Is today a silk press day or a bun day? Let’s check 👀",
-            "Your hair forecast is in — let’s see what we’re working with 💕",
-            "Weather check: Will your style slay or stray today? ✨"
-]
-
-    # SHUFFLE SUBTITLES
-        random_subtitle = random.choice(haircast_subtitles)
-    # Title
-        ctk.CTkLabel(
-            haircast_frame,
-            text=random_subtitle,
-            font=("Helvetica", 20, "bold"),
-            text_color="white",
-            fg_color="transparent"
-        ).pack(pady=20)
-
-    # Subtitle
-        ctk.CTkLabel(
-            haircast_frame,
-            text="See how today’s weather will treat your hair!",
-            font=("Helvetica", 16, "italic"),
-            text_color="white",
-            fg_color="transparent"
-        ).pack(pady=5)
 
 
     def display_forecast_cards(self, forecast_days):

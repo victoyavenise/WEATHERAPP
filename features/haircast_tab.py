@@ -1,45 +1,121 @@
-
 import customtkinter as ctk
-from tkinter import messagebox
-from config.weather_api_handler import fetch_weather_data, get_hair_tip
+import random
+from config.weather_api_handler import fetch_weather_data, get_user_location, get_hair_tip
 
+class HairCastTab(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color="#fb03b5")  # Bright pink background
+        self.pack(fill="both", expand=True)
+        
+        # Fun, sassy subtitles
+        haircast_subtitles = [
+            "See what today’s weather got planned for your hair, sis 💁🏽‍♀️",
+            "Find out if today’s forecast is hair goals… or hair drama 😅",
+            "Is today a silk press day or a bun day? Let’s check 👀",
+            "Your hair forecast is in — let’s see what we’re working with 💕",
+            "Weather check: Will your style slay or stray today? ✨"
+        ]
+        random_subtitle = random.choice(haircast_subtitles)
 
-class HairCastTab:
-    def __init__(self, tab):
-        self.tab = tab
-        self.build_haircast_tab()
+        # Title (random subtitle)
+        ctk.CTkLabel(
+            self,
+            text=random_subtitle,
+            font=("Helvetica", 20, "bold"),
+            text_color="white",
+            fg_color="transparent",
+            wraplength=500,
+            justify="center"
+        ).pack(pady=20)
 
-    def build_haircast_tab(self):
-        # Add input button for city search and weather details
-        self.haircast_city_input = ctk.CTkEntry(self.tab, placeholder_text="Enter your city", width=200)
-        self.haircast_city_input.place(relx=0.5, y=20, anchor="center")
+        # Subtitle description
+        ctk.CTkLabel(
+            self,
+            text="See how today’s weather will treat your hair!",
+            font=("Helvetica", 16, "italic"),
+            text_color="white",
+            fg_color="transparent"
+        ).pack(pady=5)
 
-        self.haircast_btn = ctk.CTkButton(self.tab, text="Get Weather", command=self.get_haircast_data, fg_color="#D94FE4",
-                                          text_color="white", hover_color="#FF02C0")
-        self.haircast_btn.place(relx=0.5, y=60, anchor="center")
+        # City entry field
+        self.city_entry = ctk.CTkEntry(
+            self,
+            placeholder_text="Enter city name...",
+            width=250,
+            font=("Helvetica", 14)
+        )
+        self.city_entry.pack(pady=10)
 
-        self.haircast_result_label = ctk.CTkLabel(self.tab, text="", font=("Helvetica", 14), text_color="black")
-        self.haircast_result_label.place(relx=0.5, y=120, anchor="center")
+        # Bind Enter key to trigger search
+        self.city_entry.bind("<Return>", lambda event: self.display_hair_tip())
 
-    def get_haircast_data(self):
-        city = self.haircast_city_input.get()
-        if len(city.strip()) < 3:
-            messagebox.showerror("Input Error", "Please enter a valid city name.")
+        # Search button
+        self.search_button = ctk.CTkButton(
+            self,
+            text="Get Hair Tip",
+            command=self.display_hair_tip,
+            fg_color="#FF69B4",  # Hot pink button
+            hover_color="#FF1493",
+            font=("Helvetica", 14, "bold"),
+            corner_radius=10
+        )
+        self.search_button.pack(pady=5)
+
+        # Result label
+        self.result_label = ctk.CTkLabel(
+            self,
+            text="Loading your hair tip...",
+            wraplength=450,
+            justify="center",
+            font=("Helvetica", 14),
+            text_color="white"
+        )
+        self.result_label.pack(pady=20)
+
+        # Auto-load current location hair tip when tab opens
+        self.after(500, self.load_current_location_tip)
+
+    def load_current_location_tip(self):
+        try:
+            # Get user's current location
+            location_data = get_user_location()
+            city = location_data["city"]
+
+            # Fetch weather data for current location
+            data = fetch_weather_data(city)
+            humidity = data["current"]["humidity"]
+
+            # Get hair tip
+            hair_tip = get_hair_tip(humidity)
+
+            # Display results
+            self.result_label.configure(
+                text=f"📍 City: {city}\n💧 Humidity: {humidity}%\n💇 Tip: {hair_tip}"
+            )
+
+        except Exception as e:
+            self.result_label.configure(text=f"⚠️ Error getting ya lo: {str(e)}")
+
+    def display_hair_tip(self):
+        city = self.city_entry.get().strip()
+        if not city:
+            self.result_label.configure(text="Sis that's not a real city!")
             return
-        
-        data = fetch_weather_data(city)
-        if not data:
-            messagebox.showerror("Error", "Could not fetch weather data for the city.")
-            return
-        
-        # Extract data
-        day_data = data["forecast"]["forecastday"][0]
-        temp = round(day_data["day"]["avgtemp_f"])
-        high = round(day_data["day"]["maxtemp_f"])
-        low = round(day_data["day"]["mintemp_f"])
-        humidity = day_data["day"]["avghumidity"]
-        hair_tip = get_hair_tip(humidity)
-        
-        # Update result label
-        result_text = f"City: {city}\nTemp: {temp}°F\nHigh: {high}°F | Low: {low}°F\nHumidity: {humidity}%\nHair Tip: {hair_tip}"
-        self.haircast_result_label.configure(text=result_text)
+
+        try:
+            # Get weather data for entered city
+            data = fetch_weather_data(city)
+            humidity = data["current"]["humidity"]
+
+            # Get hair tip
+            hair_tip = get_hair_tip(humidity)
+
+            # Display results
+            self.result_label.configure(
+                text=f"📍 City: {city}\n💧 Humidity: {humidity}%\n💇 Tip: {hair_tip}"
+            )
+
+        except Exception as e:
+            self.result_label.configure(
+                text=f"⚠️ Error Sis Try again '{city}': {str(e)}"
+            )
