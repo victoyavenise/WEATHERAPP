@@ -58,6 +58,7 @@ class ForecastHerApp:
 
         self.build_home_tab(self.home_tab)
         self.build_favorites_tab(self.favorites_tab)
+        self.build_haircast_tab(self.haircast_tab)
 
     
 
