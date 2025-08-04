@@ -1,93 +1,49 @@
 # 🌦️ ForecastHer
 
-**ForecastHer** is a personalized weather dashboard designed with women in mind. It goes beyond the forecast by giving **beauty tips**, **self-care suggestions**, and allowing users to **track multiple favorite cities** — all wrapped in a feminine, user-friendly design.
+**ForecastHer** is a personalized weather dashboard designed with women in mind.  
+It goes beyond the forecast by suggesting beauty tips, self-care activities, and allowing users to track weather across their favorite cities — all with a feminine, user-friendly design.
 
 ---
 
 ## 💡 Project Overview
 
-ForecastHer is a **Python-based desktop app** that integrates with the **WeatherAPI** and **GeoPy** to provide **real-time and 5-day forecasts** in a styled `customtkinter` GUI.  
-It’s built to help women make smart, stylish, and self-care–focused decisions based on weather, especially when **humidity** can make or break a look.
+ForecastHer is a **Python-based desktop application** built with **CustomTkinter**.  
+It integrates the **WeatherAPI** to display live and forecast weather data in a styled, interactive GUI.  
+The app helps users make better decisions about their day — especially when humidity, heat, or sudden rain might impact hair, mood, or plans.
 
 ---
 
-## 🛠️ Key Features
+## 🛠️ Core Features
 
-| Feature                    | Description                                                                 |
-|----------------------------|-----------------------------------------------------------------------------|
-| 🌸 **Humidity Hair Tips**  | Live hair care advice based on real-time humidity levels                     |
-| 🧘 **Activity Suggestor**  | Recommends self-care & lifestyle activities tailored to current conditions  |
-| 📍 **Favorite Cities Tab** | Save, view, and scroll through weather for multiple cities                   |
-| 🎨 **Styled GUI**          | Feminine pink/purple/blue theme, custom fonts, hover effects, and icons     |
-| 🖼️ **Custom Weather Icons**| Replaces generic icons with styled PNG images for each condition            |
-| 📊 **5-Day Forecast**      | Auto-generated daily forecast cards with highs, lows, and icons              |
-| 📂 **CSV Data Tracking**   | Saves weather history and favorite cities locally for offline access         |
-| 🛡️ **Error Handling**      | Friendly messages for invalid city input and API issues                      |
+| Feature                | Description                                                                 |
+|------------------------|-----------------------------------------------------------------------------|
+| 🌸 **Humidity Hair Tips** | Personalized hair care advice based on real-time humidity levels           |
+| 📍 **Favorite Cities**    | Save and view weather for multiple cities                                 |
+| 🎨 **Styled GUI**         | Feminine design with a pink/purple theme, custom fonts, and modern layout |
+| 🤝 **Team Feature**       | Compares random weather data from multiple CSV datasets                   |
 
 ---
 
-## 📸 Screenshots
+## 🆕 About the Team Feature
 
-*Coming Soon — Live UI previews of ForecastHer in action.*
+The **Team Feature** is a fun, collaborative addition that:
 
----
+- Pulls **two random rows** from **two different CSV files** in the `/features/teamfeature/Data/` folder.
+- Compares temperatures and shows a playful message like:
 
-## 🔧 Technologies Used
+> “Ohhhh, it’s hotter in Miami (89°) than in Los Angeles (82°)! 🌞🔥”
 
-- **Python 3.11+**
-- **CustomTkinter** – modern themed Tkinter UI
-- **WeatherAPI** – real-time and forecasted weather data
-- **GeoPy** – detects user location automatically
-- **Matplotlib** – planned 5-day data visualization
-- **CSV & JSON** – data persistence for history & settings
-- **dotenv** – secure API key storage
+- **Data Format Requirement:** CSVs must include at least `City` and `Temperature` columns.
+- **Minimum Requirement:** 2 CSV files (but works best with more).
+- **Custom Output:** Fun, emoji-filled responses for user engagement.
 
----
+**Example CSV Structure:**
+```csv
+City,Temperature,Humidity
+New York,78,65
+Los Angeles,85,50
+Chicago,72,55
 
-## 📂 Project Structure
-
-```
-/forecasther/
-├── main.py                         # App entry point
-├── config/
-│   ├── weather_api_handler.py      # API calls & geolocation
-├── features/
-│   ├── haircast_tab.py             # Hair tips UI logic
-│   ├── favorite_cities_tab.py      # Scrollable favorite cities tab
-│   ├── activity_suggestor.py       # Activity suggestion logic
-├── data/
-│   ├── weather_history.csv
-│   └── favorite_cities.json
-├── images/                         # Icons, weather emojis, logo
-├── .env                            # API key
-└── README.md
-```
-
----
-
-## 🚧 Roadmap
-
-### ✅ Completed:
-- WeatherAPI + GeoPy integration
-- Gradient-free clean GUI
-- Custom weather icons
-- Humidity-based hair care tips
-- Favorite cities tab (scrollable list)
-- Error handling for bad input
-- Local CSV/JSON saving
-
-### 🛠️ In Progress:
-- Activity suggestion feature
-- Matplotlib visual forecast
-- Skin care tips based on weather
-- Exportable daily weather reports
-
-### 💭 Future Plans:
-- Integration with beauty product APIs
-- Push notifications for “bad hair day” alerts
-- Social media sharing of forecasts
-
----
 
 ## ⚙️ Setup Instructions
 
@@ -128,3 +84,6 @@ Designer + Developer | Columbia University Tech Fellow | Founder, Bee Express De
 
 Got ideas? Want to collaborate?  
 Open an issue or reach out on LinkedIn!
+
+Your baby hairs will ball up into a fist and fight you. Line credited to [@nolacomics](https://www.instagram.com/backatown_comics/)
+Custom Icons provided by https://linktr.ee/nainmade
