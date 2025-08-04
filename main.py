@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 import os
+import random
 from tkinter import messagebox
 from config.weather_api_handler import fetch_weather_data, get_user_location, get_hair_tip
 from features.favorite_cities_tab import FavoriteCitiesTab
@@ -110,7 +111,39 @@ class ForecastHerApp:
         FavoriteCitiesTab(tab)
 
     def build_haircast_tab(self, tab):
-        HairCastTab(tab)
+    # Pink background frame inside the tab
+        haircast_frame = ctk.CTkFrame(tab, fg_color="#fb03b5", corner_radius=0)  # Soft pink
+        haircast_frame.pack(fill="both", expand=True)
+    
+    # List of fun, sassy subtitles
+        haircast_subtitles = [
+            "See what today’s weather got planned for your hair, sis 💁🏽‍♀️",
+            "Find out if today’s forecast is hair goals… or hair drama 😅",
+            "Is today a silk press day or a bun day? Let’s check 👀",
+            "Your hair forecast is in — let’s see what we’re working with 💕",
+            "Weather check: Will your style slay or stray today? ✨"
+]
+
+    # SHUFFLE SUBTITLES
+        random_subtitle = random.choice(haircast_subtitles)
+    # Title
+        ctk.CTkLabel(
+            haircast_frame,
+            text=random_subtitle,
+            font=("Helvetica", 20, "bold"),
+            text_color="white",
+            fg_color="transparent"
+        ).pack(pady=20)
+
+    # Subtitle
+        ctk.CTkLabel(
+            haircast_frame,
+            text="See how today’s weather will treat your hair!",
+            font=("Helvetica", 16, "italic"),
+            text_color="white",
+            fg_color="transparent"
+        ).pack(pady=5)
+
 
     def display_forecast_cards(self, forecast_days):
         for widget in self.forecast_scroll.winfo_children():
